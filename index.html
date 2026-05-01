@@ -24,14 +24,14 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="bg-slate-100 select-none">
+<body class="bg-slate-100 select-none relative">
 
-    <div class="max-w-md mx-auto h-screen flex flex-col bg-slate-50 font-sans pb-20 relative">
+    <div class="max-w-md mx-auto h-screen flex flex-col bg-slate-50 font-sans pb-20 relative overflow-hidden">
         
         <!-- Top App Bar (Minimal) -->
         <header class="bg-slate-900 text-white p-4 shadow-md relative z-10 sticky top-0">
             <div class="flex justify-between items-center">
-                <h1 class="text-xl font-black tracking-tight text-slate-100 flex items-center gap-2" onclick="forceTab('players', document.getElementById('nav-players-btn'))">
+                <h1 class="text-xl font-black tracking-tight text-slate-100 flex items-center gap-2 cursor-pointer" onclick="forceTab('players', document.getElementById('nav-players-btn'))">
                     <i class="fa-solid fa-users text-emerald-400"></i>
                     CASHFLOW
                 </h1>
@@ -51,7 +51,7 @@
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto p-4 hide-scrollbar">
             
-            <!-- Players Overview Tab (NEW) -->
+            <!-- Players Overview Tab -->
             <section id="tab-players" class="space-y-5 transition-opacity duration-300 block">
                 <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
                     <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -170,7 +170,10 @@
                     <i class="fa-solid fa-circle-info"></i> אתה עורך את התזרים של <span id="flowPlayerName" class="underline"></span>
                 </div>
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-arrow-trend-up text-emerald-500"></i> הכנסות</h2>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-trend-up text-emerald-500"></i> הכנסות
+                        <i class="fa-solid fa-circle-info text-sm text-slate-300 ml-auto cursor-pointer hover:text-emerald-500 transition-colors" onclick="showInfo('incomes')"></i>
+                    </h2>
                     <form onsubmit="addItem(event, 'incomes')" class="flex gap-2 mb-4 bg-slate-100 p-3 rounded-xl border border-slate-200">
                         <div class="flex-1 space-y-2">
                             <input type="text" id="incName" required placeholder="שם (למשל: שכירות)" class="w-full p-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -185,7 +188,10 @@
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-arrow-trend-down text-red-500"></i> הוצאות</h2>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-trend-down text-red-500"></i> הוצאות
+                        <i class="fa-solid fa-circle-info text-sm text-slate-300 ml-auto cursor-pointer hover:text-red-500 transition-colors" onclick="showInfo('expenses')"></i>
+                    </h2>
                     <form onsubmit="addItem(event, 'expenses')" class="flex gap-2 mb-4 bg-slate-100 p-3 rounded-xl border border-slate-200">
                         <div class="flex-1 space-y-2">
                             <input type="text" id="expName" required placeholder="שם (למשל: משכנתא)" class="w-full p-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -195,6 +201,29 @@
                     </form>
                     <div id="expensesList" class="space-y-2"></div>
                 </div>
+
+                <!-- Loan Calculator Feature -->
+                <div class="mt-8 bg-blue-50 p-5 rounded-2xl border border-blue-100 relative overflow-hidden shadow-sm">
+                    <div class="absolute left-[-10px] top-[-10px] text-blue-200/50 text-7xl"><i class="fa-solid fa-building-columns"></i></div>
+                    <h3 class="font-bold text-blue-900 mb-2 flex items-center gap-2 relative z-10"><i class="fa-solid fa-hand-holding-dollar text-blue-600"></i> מחשבון הלוואות אוטומטי</h3>
+                    <p class="text-xs text-blue-800 mb-4 relative z-10 font-medium">המערכת תוסיף את המזומן לידך, תרשום את סכום ההלוואה בחובות, ותוסיף את הריבית להוצאות התזרים אוטומטית.</p>
+                    
+                    <div class="flex flex-col gap-3 relative z-10">
+                        <div class="flex gap-2">
+                            <input type="number" id="loanAmountInput" placeholder="סכום ההלוואה ($)" step="1000" class="flex-1 p-3 text-sm rounded-xl border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" oninput="calcLoanInterest()">
+                            
+                            <div class="flex items-center gap-2 bg-white rounded-xl border border-blue-200 px-3 w-[110px]">
+                                <span class="text-xs font-bold text-slate-500">%</span>
+                                <input type="number" id="loanInterestInput" value="10" placeholder="ריבית" class="w-full text-sm outline-none bg-transparent text-center font-bold" oninput="calcLoanInterest()">
+                            </div>
+                        </div>
+                        <button onclick="takeLoan()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold flex flex-col justify-center items-center hover:bg-blue-700 active:scale-95 transition-all shadow-md">
+                            <span>קח הלוואה ועדכן הכל</span>
+                            <span id="loanMonthlyPreview" class="text-[11px] text-blue-200 mt-0.5 opacity-90">החזר חודשי: 0$ בתזרים</span>
+                        </button>
+                    </div>
+                </div>
+
             </section>
 
             <!-- Assets Tab -->
@@ -203,7 +232,10 @@
                     <i class="fa-solid fa-circle-info"></i> אתה עורך את המאזן של <span id="assetsPlayerName" class="underline"></span>
                 </div>
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-building text-blue-500"></i> נכסים</h2>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-building text-blue-500"></i> נכסים
+                        <i class="fa-solid fa-circle-info text-sm text-slate-300 ml-auto cursor-pointer hover:text-blue-500 transition-colors" onclick="showInfo('assets')"></i>
+                    </h2>
                     <form onsubmit="addItem(event, 'assets')" class="flex gap-2 mb-4 bg-slate-100 p-3 rounded-xl border border-slate-200">
                         <div class="flex-1 space-y-2">
                             <input type="text" id="astName" required placeholder="תיאור (למשל: מניות)" class="w-full p-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -215,7 +247,10 @@
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-orange-500"></i> חובות</h2>
+                    <h2 class="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-exclamation text-orange-500"></i> חובות (התחייבויות)
+                        <i class="fa-solid fa-circle-info text-sm text-slate-300 ml-auto cursor-pointer hover:text-orange-500 transition-colors" onclick="showInfo('liabilities')"></i>
+                    </h2>
                     <form onsubmit="addItem(event, 'liabilities')" class="flex gap-2 mb-4 bg-slate-100 p-3 rounded-xl border border-slate-200">
                         <div class="flex-1 space-y-2">
                             <input type="text" id="libName" required placeholder="למי חייבים (למשל: בנק)" class="w-full p-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -287,10 +322,69 @@
                 </button>
             </div>
         </nav>
+
+        <!-- Information Modal -->
+        <div id="infoModal" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-center p-5 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 transition-transform duration-300" id="infoModalContent">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="infoModalTitle" class="font-black text-xl text-slate-800 flex items-center gap-2"></h3>
+                    <button onclick="closeInfoModal()" class="text-slate-400 hover:text-red-500 bg-slate-100 hover:bg-red-50 p-2 rounded-full transition-colors"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <p id="infoModalText" class="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line"></p>
+                <button onclick="closeInfoModal()" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 active:scale-95 transition-all shadow-md">הבנתי, תודה!</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         const apiKey = ""; 
+
+        // --- Info Modal Data & Functions ---
+        const infoData = {
+            incomes: { 
+                title: '<i class="fa-solid fa-arrow-trend-up text-emerald-500"></i> הכנסות (Incomes)', 
+                text: 'כאן מזינים כל סכום שנכנס אליכם באופן קבוע מדי חודש.\n\n✅ <b>משכורת רגילה:</b> מופיעה בכרטיס המקצוע.\n✅ <b>הכנסה פסיבית (קריטי):</b> רווחים מנדל"ן, דיבידנדים או עסקים. \n\n⚠️ חובה לסמן <b>V (הכנסה פסיבית)</b> כדי שהמערכת תחשב את זה כמדד לניצחון במשחק!' 
+            },
+            expenses: { 
+                title: '<i class="fa-solid fa-arrow-trend-down text-red-500"></i> הוצאות (Expenses)', 
+                text: 'כל סכום שאתה חייב לשלם בכל חודש (יום משכורת).\n\n✅ <b>הוצאות קבועות:</b> מסים, משכנתא, ילדים (לפי כרטיס המקצוע או משבצות בלוח).\n✅ <b>ריביות בנק:</b> אם לקחתם הלוואה מהבנק כדי לממן עסקה, הריבית הקבועה עליה (לרוב 10% מסכום ההלוואה) נרשמת כאן.' 
+            },
+            assets: { 
+                title: '<i class="fa-solid fa-building text-blue-500"></i> נכסים (Assets)', 
+                text: 'רישום הרכוש שלכם למטרת מעקב בלבד (לא משפיע על המשכורת עצמה).\n\n✅ <b>מניות וקרנות:</b> שקניתם בזול וממתינים לעליית ערך.\n✅ <b>נדל"ן ועסקים:</b> ההכנסה מהם אמנם נרשמת ב"תזרים", אבל הנכס עצמו נרשם כאן כדי לזכור מה יש לכם למכור כשיבוא קונה.' 
+            },
+            liabilities: { 
+                title: '<i class="fa-solid fa-circle-exclamation text-orange-500"></i> חובות (Liabilities)', 
+                text: 'החובות ארוכי הטווח שלכם למעקב (תשלום הקרן).\n\n✅ <b>חובות מהמקצוע:</b> משכנתא וחובות לימודים.\n✅ <b>הלוואות בנקאיות:</b> כשאתם לוקחים הלוואה, רושמים כאן את סכום ההלוואה המלא (למשל: 4,000$). *זכרו שהריבית נרשמת בהוצאות.' 
+            }
+        };
+
+        function showInfo(type) {
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('infoModalContent');
+            document.getElementById('infoModalTitle').innerHTML = infoData[type].title;
+            document.getElementById('infoModalText').innerHTML = infoData[type].text;
+            
+            modal.classList.remove('hidden');
+            // Allow display:block to render before triggering opacity transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('infoModalContent');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // match duration
+        }
 
         // --- AI Settings ---
         function loadAISettings() {
@@ -361,14 +455,12 @@
             req.onsuccess = (e) => {
                 if (req.result && req.result.data) {
                     let loaded = req.result.data;
-                    // Migration from old single player DB structure if needed
                     if (loaded.players) {
                         appState = loaded;
                     } else if (loaded.cash !== undefined) {
-                        // It's the old structure, migrate it to a single player
                         appState.players = [{
                             id: 1,
-                            name: 'שחקן 1 (היסטוריה)',
+                            name: 'שחקן 1',
                             cash: loaded.cash || 0,
                             incomes: loaded.incomes || [],
                             expenses: loaded.expenses || [],
@@ -437,14 +529,12 @@
             
             if (!player) {
                 badge.classList.add('hidden');
-                // Ensure we are on players tab if no player is active
                 if(document.getElementById('tab-players').classList.contains('hidden')) {
                     forceTab('players', document.getElementById('nav-players-btn'));
                 }
                 return;
             }
 
-            // Player is active - update specific UI
             badge.classList.remove('hidden');
             document.getElementById('headerPlayerName').innerText = player.name;
             document.getElementById('flowPlayerName').innerText = player.name;
@@ -555,6 +645,48 @@
                 document.getElementById('quickCash').value = '';
                 document.getElementById('quickCashDesc').value = '';
             }
+        }
+        
+        // --- Loan Calculator Actions ---
+        function calcLoanInterest() {
+            const amount = Number(document.getElementById('loanAmountInput').value) || 0;
+            const interest = Number(document.getElementById('loanInterestInput').value) || 10;
+            const monthly = (amount * interest) / 100;
+            document.getElementById('loanMonthlyPreview').innerText = `החזר חודשי: ${monthly}$ בתזרים`;
+        }
+        
+        function takeLoan() {
+            const p = getActivePlayer();
+            if(!p) return alert("אנא בחר שחקן קודם.");
+            
+            const amount = Number(document.getElementById('loanAmountInput').value);
+            const interest = Number(document.getElementById('loanInterestInput').value) || 10;
+            
+            if(!amount || amount <= 0) return alert('הזן סכום הלוואה תקין.');
+            if(amount % 1000 !== 0) {
+                if(!confirm(`הסכום ${amount}$ אינו כפולה של 1,000$. במשחק נהוג לקחת בכפולות של 1,000. להמשיך בכל זאת?`)) return;
+            }
+            
+            const monthly = Math.round((amount * interest) / 100);
+            
+            // 1. Add Cash
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            p.cash += amount;
+            p.history.unshift({ id: Date.now(), desc: `לקיחת הלוואה מהבנק (${interest}%)`, amount: amount, time: timeStr });
+            
+            // 2. Add Expense
+            p.expenses.push({ id: Date.now() + 1, name: 'ריבית הלוואה בנקאית', amount: monthly });
+            
+            // 3. Add Liability
+            p.liabilities.push({ id: Date.now() + 2, name: 'הלוואה בנקאית', amount: amount });
+            
+            // Reset input
+            document.getElementById('loanAmountInput').value = '';
+            calcLoanInterest();
+            
+            updateUI();
+            alert(`✅ ההלוואה ע"ס $${amount.toLocaleString()} בוצעה בהצלחה!\n\n• המזומן התעדכן.\n• נוסף חוב למאזן.\n• הוצאות התזרים עלו ב-$${monthly.toLocaleString()}.`);
         }
 
         function addItem(e, listName) {
